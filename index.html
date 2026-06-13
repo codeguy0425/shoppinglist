@@ -66,13 +66,17 @@
         }
 
         .header-actions button {
-            padding: 6px 12px;
+            padding: 6px 10px;
             font-size: 0.8rem;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            line-height: 1;
         }
 
         .btn-sm {
-            padding: 6px 12px;
+            padding: 6px 10px;
             font-size: 0.8rem;
         }
 
@@ -80,6 +84,11 @@
             background: transparent;
             color: var(--text);
             border: 1px solid var(--border);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            line-height: 1;
         }
 
         .btn-outline:hover {
@@ -275,8 +284,12 @@
         }
 
         .list-header-actions button {
-            padding: 4px 10px;
+            padding: 4px 8px;
             font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
 
         .delete-list-btn {
@@ -496,7 +509,7 @@
 
             td, th { padding: 5px 0; }
 
-            .header-actions button { font-size: 0.75rem; padding: 5px 10px; }
+            .header-actions button { font-size: 0.75rem; padding: 4px 6px; }
         }
 
         @media (max-width: 400px) {
@@ -512,10 +525,10 @@
         <div class="header-row">
             <h1>🛒 <span data-i18n="appTitle">Shopping List</span></h1>
             <div class="header-actions">
-                <button class="btn-outline btn-sm" onclick="exportData()" data-i18n="export">Export</button>
-                <button class="btn-outline btn-sm" onclick="document.getElementById('importInput').click()" data-i18n="import">Import</button>
+                <button class="btn-outline btn-sm" onclick="exportData()" title="Export"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                <button class="btn-outline btn-sm" onclick="document.getElementById('importInput').click()" title="Import"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
                 <input type="file" id="importInput" accept=".json" onchange="importData(event)">
-                <button id="langToggle" class="btn-outline btn-sm">中文</button>
+                <button id="langToggle" class="btn-outline btn-sm" title="Language"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span id="langLabel" style="font-size:0.7rem;margin-left:2px">EN</span></button>
             </div>
         </div>
         <p data-i18n="appDesc">Keep track of your shopping</p>
@@ -539,7 +552,7 @@
                     <datalist id="saved-items"></datalist>
                     <p class="voice-hint" id="voiceHint"></p>
                 </div>
-                <button id="voiceBtn" class="voice-btn" onclick="toggleVoice()" title="Voice input">🎤</button>
+                <button id="voiceBtn" class="voice-btn" onclick="toggleVoice()" title="Voice input"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
             </div>
             <div class="input-group">
                 <label data-i18n="price">Price ($)</label>
@@ -597,7 +610,7 @@
             exportError: "No data to export",
             importError: "Invalid file",
             renameDone: "List renamed",
-            voiceBtn: "🎤",
+            voiceBtn: "",
             voiceListening: "Listening…",
             voiceHint: 'Say "milk 3.50 2" or just the item name',
             voiceHintZh: '說「牛奶 3.5 2」或只說商品名稱',
@@ -640,7 +653,7 @@
             exportError: "沒有資料可匯出",
             importError: "檔案格式錯誤",
             renameDone: "清單已重新命名",
-            voiceBtn: "🎤",
+            voiceBtn: "",
             voiceListening: "聆聽中…",
             voiceHint: '說「牛奶 3.5 2」或只說商品名稱',
             voiceHintZh: '說「牛奶 3.5 2」或只說商品名稱',
@@ -660,7 +673,7 @@
 
     function applyLang() {
         document.documentElement.lang = lang === 'zh' ? 'zh-TW' : 'en';
-        document.getElementById('langToggle').textContent = lang === 'zh' ? 'English' : '中文';
+        document.getElementById('langLabel').textContent = lang === 'zh' ? '中文' : 'EN';
         document.title = t('title');
         document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
@@ -744,7 +757,7 @@
         isRecording = false;
         const btn = document.getElementById('voiceBtn');
         btn.classList.remove('recording');
-        btn.textContent = t('voiceBtn');
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
         const hint = document.getElementById('voiceHint');
         hint.textContent = lang === 'zh' ? t('voiceHintZh') : t('voiceHint');
         hint.className = 'voice-hint';
@@ -1034,8 +1047,8 @@
                         <h3>${name}</h3>
                     </div>
                     <div class="list-header-actions">
-                        <button class="rename-btn btn-outline" onclick="startRename('${name}')">✎</button>
-                        <button class="delete-list-btn btn-outline" onclick="deleteList('${name}')">${t('deleteList')}</button>
+                        <button class="rename-btn btn-outline" onclick="startRename('${name}')" title="${t('rename')}"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>
+                        <button class="delete-list-btn btn-outline" onclick="deleteList('${name}')" title="${t('deleteList')}"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
                     </div>
                 </div>
                 <table>
