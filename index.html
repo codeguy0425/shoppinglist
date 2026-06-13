@@ -638,21 +638,10 @@
 
         /* ── Drag to reorder ── */
         .item-row {
-            cursor: grab;
             user-select: none;
             -webkit-user-select: none;
-        }
-
-        .item-row:active { cursor: grabbing; }
-
-        .item-row.dragging {
-            opacity: 0.4;
-            background: var(--primary-light);
-        }
-
-        .item-row.drag-over td {
-            border-top: 2px solid var(--primary);
-            padding-top: 4px;
+            -webkit-touch-callout: none;
+            touch-action: manipulation;
         }
 
         /* Mobile responsive */
@@ -951,155 +940,7 @@
         document.body.classList.toggle('shopping-mode', shoppingMode);
     }
 
-    // ── Drag to Reorder ──
-    let dragSource = null;
-    let dragListName = null;
-
-    function initDrag(row, listName) {
-        row.setAttribute('draggable', 'true');
-
-        row.addEventListener('dragstart', e => {
-            if (e.target.closest('button, input, select, .check-item')) { e.preventDefault(); return; }
-            dragSource = row;
-            dragListName = listName;
-            row.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', row.dataset.itemId);
-        });
-
-        row.addEventListener('dragend', () => {
-            row.classList.remove('dragging');
-            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-            dragSource = null;
-            dragListName = null;
-        });
-
-        row.addEventListener('dragover', e => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            if (row !== dragSource) row.classList.add('drag-over');
-        });
-
-        row.addEventListener('dragleave', () => {
-            row.classList.remove('drag-over');
-        });
-
-        row.addEventListener('drop', e => {
-            e.preventDefault();
-            row.classList.remove('drag-over');
-            if (!dragSource || row === dragSource || !dragListName) return;
-            const from = parseInt(dragSource.dataset.itemId);
-            const to = parseInt(row.dataset.itemId);
-            if (isNaN(from) || isNaN(to)) return;
-            const items = shoppingData[dragListName];
-            const fromIdx = items.findIndex(i => i.id === from);
-            const toIdx = items.findIndex(i => i.id === to);
-            if (fromIdx === -1 || toIdx === -1) return;
-            const [moved] = items.splice(fromIdx, 1);
-            const insertAt = fromIdx < toIdx ? toIdx - 1 : toIdx;
-            items.splice(insertAt, 0, moved);
-            saveAndRender();
-        });
-
-        // Touch support: long-press to drag
-        let touchTimer = null;
-        let touchDragging = false;
-        let touchStartY = 0;
-        let touchStartX = 0;
-        let touchClone = null;
-        let touchDropTarget = null;
-
-        row.addEventListener('touchstart', e => {
-            if (e.target.closest('button, input, select, .check-item')) return;
-            const t = e.touches[0];
-            touchStartY = t.clientY;
-            touchStartX = t.clientX;
-            touchDragging = false;
-            touchDropTarget = null;
-            touchTimer = setTimeout(() => {
-                touchDragging = true;
-                dragSource = row;
-                dragListName = listName;
-                row.classList.add('dragging');
-                touchClone = row.cloneNode(true);
-                touchClone.style.position = 'fixed';
-                touchClone.style.pointerEvents = 'none';
-                touchClone.style.opacity = '0.7';
-                touchClone.style.width = row.offsetWidth + 'px';
-                touchClone.style.zIndex = '999';
-                touchClone.style.transform = 'scale(1.02)';
-                touchClone.style.background = 'var(--card)';
-                touchClone.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
-                touchClone.style.borderRadius = '8px';
-                touchClone.style.left = row.getBoundingClientRect().left + 'px';
-                touchClone.style.top = (t.clientY - row.offsetHeight / 2) + 'px';
-                document.body.appendChild(touchClone);
-            }, 300);
-        }, { passive: true });
-
-        row.addEventListener('touchmove', e => {
-            const t = e.touches[0];
-            const dy = Math.abs(t.clientY - touchStartY);
-            const dx = Math.abs(t.clientX - touchStartX);
-            if (!touchDragging) {
-                if (dy > 10 || dx > 10) { clearTimeout(touchTimer); touchTimer = null; }
-                return;
-            }
-            e.preventDefault();
-            if (touchClone) {
-                touchClone.style.top = (t.clientY - row.offsetHeight / 2) + 'px';
-            }
-            touchDropTarget = null;
-            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-            const target = document.elementFromPoint(t.clientX, t.clientY);
-            if (!target) return;
-            const tr = target.closest('.item-row');
-            if (tr && tr !== row && !tr.classList.contains('dragging')) {
-                touchDropTarget = tr;
-                tr.classList.add('drag-over');
-            }
-        }, { passive: false });
-
-        row.addEventListener('touchend', e => {
-            if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
-            if (touchClone) { touchClone.remove(); touchClone = null; }
-            if (touchDragging) {
-                row.classList.remove('dragging');
-                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-                if (touchDropTarget && dragListName) {
-                    const from = parseInt(dragSource.dataset.itemId);
-                    const to = parseInt(touchDropTarget.dataset.itemId);
-                    if (!isNaN(from) && !isNaN(to)) {
-                        const items = shoppingData[dragListName];
-                        const fromIdx = items.findIndex(i => i.id === from);
-                        const toIdx = items.findIndex(i => i.id === to);
-                        if (fromIdx !== -1 && toIdx !== -1) {
-                            const [moved] = items.splice(fromIdx, 1);
-                            const insertAt = fromIdx < toIdx ? toIdx - 1 : toIdx;
-                            items.splice(insertAt, 0, moved);
-                            saveAndRender();
-                        }
-                    }
-                }
-                dragSource = null;
-                dragListName = null;
-                touchDragging = false;
-                touchDropTarget = null;
-            }
-        }, { passive: true });
-
-        row.addEventListener('touchcancel', () => {
-            if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
-            if (touchClone) { touchClone.remove(); touchClone = null; }
-            if (touchDragging) {
-                row.classList.remove('dragging');
-                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-            }
-            dragSource = null;
-            dragListName = null;
-            touchDragging = false;
-        }, { passive: true });
-    }
+    // ── Toast ──
     function showToast(msg, type = '') {
         const container = document.getElementById('toastContainer');
         const el = document.createElement('div');
@@ -1486,8 +1327,6 @@
             `;
 
             display.appendChild(card);
-
-            card.querySelectorAll('.item-row').forEach(row => initDrag(row, name));
         });
 
         allItems.forEach(name => {
