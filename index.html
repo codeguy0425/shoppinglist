@@ -996,7 +996,8 @@
             const toIdx = items.findIndex(i => i.id === to);
             if (fromIdx === -1 || toIdx === -1) return;
             const [moved] = items.splice(fromIdx, 1);
-            items.splice(toIdx, 0, moved);
+            const insertAt = fromIdx < toIdx ? toIdx - 1 : toIdx;
+            items.splice(insertAt, 0, moved);
             saveAndRender();
         });
 
@@ -1006,6 +1007,7 @@
         let touchStartY = 0;
         let touchStartX = 0;
         let touchClone = null;
+        let touchDropTarget = null;
 
         row.addEventListener('touchstart', e => {
             if (e.target.closest('button, input, select, .check-item')) return;
@@ -1013,6 +1015,7 @@
             touchStartY = t.clientY;
             touchStartX = t.clientX;
             touchDragging = false;
+            touchDropTarget = null;
             touchTimer = setTimeout(() => {
                 touchDragging = true;
                 dragSource = row;
@@ -1046,11 +1049,13 @@
             if (touchClone) {
                 touchClone.style.top = (t.clientY - row.offsetHeight / 2) + 'px';
             }
+            touchDropTarget = null;
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
             const target = document.elementFromPoint(t.clientX, t.clientY);
             if (!target) return;
             const tr = target.closest('.item-row');
             if (tr && tr !== row && !tr.classList.contains('dragging')) {
-                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                touchDropTarget = tr;
                 tr.classList.add('drag-over');
             }
         }, { passive: false });
@@ -1061,21 +1066,17 @@
             if (touchDragging) {
                 row.classList.remove('dragging');
                 document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-                if (!dragListName) { dragSource = null; return; }
-                const t = e.changedTouches[0];
-                const target = document.elementFromPoint(t.clientX, t.clientY);
-                if (!target) { dragSource = null; dragListName = null; touchDragging = false; return; }
-                const tr = target.closest('.item-row');
-                if (tr && tr !== dragSource) {
+                if (touchDropTarget && dragListName) {
                     const from = parseInt(dragSource.dataset.itemId);
-                    const to = parseInt(tr.dataset.itemId);
+                    const to = parseInt(touchDropTarget.dataset.itemId);
                     if (!isNaN(from) && !isNaN(to)) {
                         const items = shoppingData[dragListName];
                         const fromIdx = items.findIndex(i => i.id === from);
                         const toIdx = items.findIndex(i => i.id === to);
                         if (fromIdx !== -1 && toIdx !== -1) {
                             const [moved] = items.splice(fromIdx, 1);
-                            items.splice(toIdx, 0, moved);
+                            const insertAt = fromIdx < toIdx ? toIdx - 1 : toIdx;
+                            items.splice(insertAt, 0, moved);
                             saveAndRender();
                         }
                     }
@@ -1083,6 +1084,7 @@
                 dragSource = null;
                 dragListName = null;
                 touchDragging = false;
+                touchDropTarget = null;
             }
         }, { passive: true });
 
