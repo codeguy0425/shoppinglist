@@ -2,50 +2,133 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title data-i18n="title">Smart Shopping List</title>
     <style>
+        * { box-sizing: border-box; }
+
         :root {
             --primary: #4f46e5;
-            --bg: #f8fafc;
+            --primary-light: #eef2ff;
+            --primary-dark: #3730a3;
+            --bg: #f1f5f9;
             --card: #ffffff;
             --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
             --danger: #ef4444;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 16px;
+            min-height: 100dvh;
             display: flex;
             justify-content: center;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 860px;
             width: 100%;
         }
 
         header {
-            text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-row h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .header-actions button {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg);
+        }
+
+        header p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            outline: none;
+            font-size: 0.95rem;
+            background: var(--card);
+            transition: border 0.2s;
+        }
+
+        .filter-section input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
 
         .input-section {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .grid-inputs {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .input-group {
@@ -53,23 +136,39 @@
             flex-direction: column;
         }
 
+        .input-group.full {
+            grid-column: 1 / -1;
+        }
+
         label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            margin-bottom: 5px;
-            color: #64748b;
+            margin-bottom: 4px;
+            color: var(--muted);
         }
 
         input, select {
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             outline: none;
+            font-size: 0.95rem;
             transition: border 0.2s;
+            background: #fafbfc;
         }
 
         input:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+            background: #fff;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button {
+            opacity: 0.5;
         }
 
         button {
@@ -77,89 +176,332 @@
             color: white;
             padding: 12px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: opacity 0.2s;
+            font-size: 0.95rem;
+            transition: background 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        button:active {
+            transform: scale(0.98);
         }
 
         button:hover {
-            opacity: 0.9;
+            background-color: var(--primary-dark);
         }
 
         .lists-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
         }
 
         .list-card {
             background: var(--card);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 16px;
+            transition: box-shadow 0.2s;
         }
 
-        .list-card h3 {
-            margin-top: 0;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f1f5f9;
+        .list-card.hidden {
+            display: none;
+        }
+
+        .list-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--bg);
+            gap: 8px;
+        }
+
+        .list-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .list-title-wrap h3 {
+            margin: 0;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .list-title-wrap input {
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border: 1px solid var(--primary);
+            border-radius: 6px;
+            width: 100%;
+            background: #fff;
+        }
+
+        .rename-btn, .rename-confirm, .rename-cancel {
+            background: none;
+            border: none;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--muted);
+            border-radius: 4px;
+        }
+
+        .rename-btn:hover, .rename-confirm:hover, .rename-cancel:hover {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .rename-confirm { color: var(--success); }
+        .rename-cancel { color: var(--danger); }
+
+        .list-header-actions {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .list-header-actions button {
+            padding: 4px 10px;
+            font-size: 0.72rem;
         }
 
         .delete-list-btn {
             background: none;
             color: var(--danger);
-            padding: 2px 8px;
             border: 1px solid var(--danger);
-            font-size: 0.7rem;
+        }
+
+        .delete-list-btn:hover {
+            background: #fef2f2;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
         th {
             text-align: left;
-            font-size: 0.8rem;
-            color: #94a3b8;
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 600;
+            padding-bottom: 6px;
         }
+
+        th:nth-child(2) { text-align: center; }
+        th:nth-child(3) { text-align: right; }
+        th:nth-child(4) { width: 30px; }
+        th:nth-child(5) { width: 30px; }
 
         td {
-            padding: 8px 0;
+            padding: 6px 0;
             font-size: 0.9rem;
+            vertical-align: middle;
         }
 
-        .item-total {
-            font-weight: bold;
-            text-align: right;
+        td:nth-child(2) { text-align: center; color: var(--muted); font-size: 0.8rem; }
+        td:nth-child(3) { text-align: right; font-weight: 600; }
+        td:nth-child(4), td:nth-child(5) { text-align: center; }
+
+        .item-row.checked td {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .item-row.checked td:nth-child(4),
+        .item-row.checked td:nth-child(5) {
+            opacity: 1;
+        }
+
+        .check-item {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--success);
+        }
+
+        .edit-item-btn, .del-item-btn {
+            background: none;
+            border: none;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            color: var(--muted);
+        }
+
+        .edit-item-btn:hover { background: var(--primary-light); color: var(--primary); }
+        .del-item-btn:hover { background: #fef2f2; color: var(--danger); }
+
+        .item-edit-row td {
+            padding: 4px 0;
+        }
+
+        .item-edit-row input {
+            padding: 6px 8px;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        .item-edit-row .edit-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .item-edit-row .edit-actions button {
+            padding: 4px 8px;
+            font-size: 0.75rem;
         }
 
         .grand-total {
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 700;
             text-align: right;
             color: var(--primary);
-            margin-top: 10px;
             padding-top: 10px;
-            border-top: 1px solid #f1f5f9;
-        }
-
-        .delete-item {
-            color: var(--danger);
-            cursor: pointer;
-            font-weight: bold;
+            border-top: 1px solid var(--border);
         }
 
         .empty-msg {
+            grid-column: 1 / -1;
             text-align: center;
-            color: #94a3b8;
-            padding: 20px;
+            color: var(--muted);
+            padding: 40px 20px;
+        }
+
+        .empty-msg p {
+            margin: 8px 0 0;
+            font-size: 0.9rem;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            animation: toastIn 0.25s ease-out;
+            pointer-events: auto;
+            text-align: center;
+            width: 100%;
+        }
+
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* File input hidden */
+        #importInput { display: none; }
+
+        /* Voice button */
+        .voice-btn {
+            background: var(--card);
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            white-space: nowrap;
+        }
+
+        .voice-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+        .voice-btn.recording {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+        }
+
+        .input-voice-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .input-voice-row .input-group { flex: 1; }
+
+        .voice-hint {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin: 0 0 4px;
+            min-height: 1.2em;
+        }
+
+        .voice-hint.listening { color: var(--danger); font-weight: 600; }
+
+        /* Mobile responsive */
+        @media (max-width: 640px) {
+            body { padding: 12px; }
+
+            .header-row h1 { font-size: 1.15rem; }
+
+            .grid-inputs { grid-template-columns: 1fr; gap: 10px; }
+
+            .lists-container { grid-template-columns: 1fr; gap: 12px; }
+
+            .list-card { padding: 14px; }
+
+            .input-section { padding: 16px; }
+
+            .card { padding: 16px; }
+
+            .toast { font-size: 0.85rem; padding: 10px 16px; }
+
+            table { font-size: 0.85rem; }
+
+            td, th { padding: 5px 0; }
+
+            .header-actions button { font-size: 0.75rem; padding: 5px 10px; }
+        }
+
+        @media (max-width: 400px) {
+            .list-header { flex-wrap: wrap; }
+            .list-header-actions { width: 100%; justify-content: flex-end; }
         }
     </style>
 </head>
@@ -167,87 +509,152 @@
 
 <div class="container">
     <header>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-            <h1>🛒 <span data-i18n="appTitle">Shopping List Manager</span></h1>
-            <button id="langToggle" style="padding:6px 14px;font-size:0.85rem">中文</button>
+        <div class="header-row">
+            <h1>🛒 <span data-i18n="appTitle">Shopping List</span></h1>
+            <div class="header-actions">
+                <button class="btn-outline btn-sm" onclick="exportData()" data-i18n="export">Export</button>
+                <button class="btn-outline btn-sm" onclick="document.getElementById('importInput').click()" data-i18n="import">Import</button>
+                <input type="file" id="importInput" accept=".json" onchange="importData(event)">
+                <button id="langToggle" class="btn-outline btn-sm">中文</button>
+            </div>
         </div>
-        <p data-i18n="appDesc">Organize your shopping by categories</p>
+        <p data-i18n="appDesc">Keep track of your shopping</p>
     </header>
 
-    <div class="input-section">
+    <div class="filter-section">
+        <input type="text" id="filterInput" oninput="filterLists()" data-i18n-placeholder="filterPlaceholder" placeholder="Search lists or items…">
+    </div>
+
+    <div class="card input-section">
         <div class="grid-inputs">
-            <div class="input-group">
+            <div class="input-group full">
                 <label data-i18n="listName">List Name</label>
-                <input type="text" id="listName" placeholder="e.g. Grocery, Tech" list="saved-lists">
+                <input type="text" id="listName" data-i18n-placeholder="listNamePlaceholder" placeholder="e.g. Grocery, Tech" list="saved-lists">
                 <datalist id="saved-lists"></datalist>
             </div>
-            <div class="input-group">
-                <label data-i18n="itemName">Item Name</label>
-                <input type="text" id="itemName" placeholder="e.g. Milk">
+            <div class="input-voice-row">
+                <div class="input-group">
+                    <label data-i18n="itemName">Item</label>
+                    <input type="text" id="itemName" data-i18n-placeholder="itemPlaceholder" placeholder="e.g. Milk" list="saved-items">
+                    <datalist id="saved-items"></datalist>
+                    <p class="voice-hint" id="voiceHint"></p>
+                </div>
+                <button id="voiceBtn" class="voice-btn" onclick="toggleVoice()" title="Voice input">🎤</button>
             </div>
             <div class="input-group">
                 <label data-i18n="price">Price ($)</label>
-                <input type="number" id="itemPrice" step="0.01" placeholder="0.00">
+                <input type="number" id="itemPrice" step="0.01" min="0" placeholder="0.00">
             </div>
             <div class="input-group">
-                <label data-i18n="quantity">Quantity</label>
-                <input type="number" id="itemQty" value="1">
+                <label data-i18n="quantity">Qty</label>
+                <input type="number" id="itemQty" min="1" value="1">
             </div>
         </div>
-        <button onclick="addItem()" data-i18n="addToList">Add to List</button>
+        <button onclick="addItem()" class="btn-block" data-i18n="addToList">Add to List</button>
     </div>
 
-    <div id="listsDisplay" class="lists-container">
-    </div>
+    <div id="listsDisplay" class="lists-container"></div>
 </div>
 
+<div id="toastContainer" class="toast-container"></div>
+
 <script>
+    // ── i18n ──
     const i18n = {
         en: {
-            title: "Smart Shopping List",
-            appTitle: "Shopping List Manager",
-            appDesc: "Organize your shopping by categories",
+            title: "Shopping List",
+            appTitle: "Shopping List",
+            appDesc: "Keep track of your shopping",
             listName: "List Name",
-            itemName: "Item Name",
+            listNamePlaceholder: "e.g. Grocery, Tech",
+            itemName: "Item",
+            itemPlaceholder: "e.g. Milk",
             price: "Price ($)",
-            quantity: "Quantity",
+            quantity: "Qty",
             addToList: "Add to List",
             item: "Item",
-            total: "Total",
+            qtyCol: "Qty",
+            totalCol: "Total",
             empty: "Empty",
-            emptyMsg: "No lists created yet. Start by adding an item!",
-            deleteList: "Delete List",
+            emptyMsg: "No lists yet",
+            emptySub: "Start by adding an item above!",
+            deleteList: "Delete",
             deleteConfirm: 'Delete the entire "{{name}}" list?',
             alertFill: "Please fill in all fields correctly.",
             grandTotal: "Total: ${{amount}}",
+            edit: "Edit",
+            save: "Save",
+            cancel: "Cancel",
+            rename: "Rename",
+            renamePlaceholder: "New list name",
+            export: "Export",
+            import: "Import",
+            filterPlaceholder: "Search lists or items…",
+            itemAdded: "Item added!",
+            itemDeleted: "Item deleted",
+            listDeleted: "List deleted",
+            imported: "Data imported!",
+            exportError: "No data to export",
+            importError: "Invalid file",
+            renameDone: "List renamed",
+            voiceBtn: "🎤",
+            voiceListening: "Listening…",
+            voiceHint: 'Say "milk 3.50 2" or just the item name',
+            voiceHintZh: '說「牛奶 3.5 2」或只說商品名稱',
+            voiceError: "Voice not supported in this browser",
+            voiceParsed: 'Added "{{name}}" via voice!',
         },
         zh: {
-            title: "智慧購物清單",
-            appTitle: "購物清單管理",
-            appDesc: "按類別整理您的購物項目",
+            title: "購物清單",
+            appTitle: "購物清單",
+            appDesc: "輕鬆管理您的採購項目",
             listName: "清單名稱",
-            itemName: "商品名稱",
+            listNamePlaceholder: "例如：生鮮、3C",
+            itemName: "商品",
+            itemPlaceholder: "例如：牛奶",
             price: "價格 ($)",
             quantity: "數量",
             addToList: "加入清單",
             item: "項目",
-            total: "小計",
+            qtyCol: "數量",
+            totalCol: "小計",
             empty: "無項目",
-            emptyMsg: "尚未建立清單，請新增項目！",
-            deleteList: "刪除清單",
+            emptyMsg: "尚無任何清單",
+            emptySub: "請在上方新增項目！",
+            deleteList: "刪除",
             deleteConfirm: '確定刪除「{{name}}」清單？',
             alertFill: "請正確填寫所有欄位。",
             grandTotal: "總計：${{amount}}",
+            edit: "編輯",
+            save: "儲存",
+            cancel: "取消",
+            rename: "重新命名",
+            renamePlaceholder: "新清單名稱",
+            export: "匯出",
+            import: "匯入",
+            filterPlaceholder: "搜尋清單或項目…",
+            itemAdded: "已加入項目！",
+            itemDeleted: "已刪除項目",
+            listDeleted: "已刪除清單",
+            imported: "資料已匯入！",
+            exportError: "沒有資料可匯出",
+            importError: "檔案格式錯誤",
+            renameDone: "清單已重新命名",
+            voiceBtn: "🎤",
+            voiceListening: "聆聽中…",
+            voiceHint: '說「牛奶 3.5 2」或只說商品名稱',
+            voiceHintZh: '說「牛奶 3.5 2」或只說商品名稱',
+            voiceError: "此瀏覽器不支援語音輸入",
+            voiceParsed: '已透過語音加入「{{name}}」！',
         }
     };
 
     let lang = localStorage.getItem('shopping_lang') || 'en';
 
     function t(key, vars = {}) {
-        let str = i18n[lang][key] || key;
-        for (const [k, v] of Object.entries(vars)) {
-            str = str.replace(`{{${k}}}`, v);
-        }
+        let str = i18n[lang][key];
+        if (!str) { const el = document.querySelector(`[data-i18n="${key}"]`); str = el ? el.textContent : key; }
+        for (const [k, v] of Object.entries(vars)) str = str.replace(`{{${k}}}`, v);
         return str;
     }
 
@@ -255,19 +662,14 @@
         document.documentElement.lang = lang === 'zh' ? 'zh-TW' : 'en';
         document.getElementById('langToggle').textContent = lang === 'zh' ? 'English' : '中文';
         document.title = t('title');
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            el.textContent = t(el.dataset.i18n);
+        document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            el.placeholder = t(el.dataset.i18nPlaceholder);
         });
-        document.getElementById('listName').placeholder = lang === 'zh' ? '例如：生鮮、3C' : 'e.g. Grocery, Tech';
-        document.getElementById('itemName').placeholder = lang === 'zh' ? '例如：牛奶' : 'e.g. Milk';
-        document.getElementById('itemPrice').placeholder = lang === 'zh' ? '0.00' : '0.00';
-        updateEmptyMsg();
+        const hint = document.getElementById('voiceHint');
+        if (hint && !isRecording) hint.textContent = lang === 'zh' ? t('voiceHintZh') : t('voiceHint');
+        filterLists();
         render();
-    }
-
-    function updateEmptyMsg() {
-        const empty = document.querySelector('.empty-msg');
-        if (empty) empty.textContent = t('emptyMsg');
     }
 
     document.getElementById('langToggle').addEventListener('click', () => {
@@ -276,67 +678,326 @@
         applyLang();
     });
 
+    // ── Toast ──
+    function showToast(msg, type = '') {
+        const container = document.getElementById('toastContainer');
+        const el = document.createElement('div');
+        el.className = 'toast' + (type ? ' ' + type : '');
+        el.textContent = msg;
+        container.appendChild(el);
+        setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 300); }, 2000);
+    }
+
+    // ── Data ──
     let shoppingData = JSON.parse(localStorage.getItem('shopping_data')) || {};
 
+    // ── Enter key ──
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            const active = document.activeElement;
+            const inputs = ['listName','itemName','itemPrice','itemQty'];
+            if (active && inputs.includes(active.id)) addItem();
+        }
+    });
+
+    // ── Voice Input ──
+    let recognition = null;
+    let isRecording = false;
+
+    function toggleVoice() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) { showToast(t('voiceError'), 'error'); return; }
+
+        if (isRecording) { stopVoice(); return; }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = lang === 'zh' ? 'zh-TW' : 'en-US';
+        recognition.interimResults = false;
+        recognition.continuous = false;
+        recognition.maxAlternatives = 1;
+
+        const btn = document.getElementById('voiceBtn');
+        const hint = document.getElementById('voiceHint');
+
+        recognition.onstart = () => {
+            isRecording = true;
+            btn.classList.add('recording');
+            btn.textContent = '⏹';
+            hint.textContent = t('voiceListening');
+            hint.className = 'voice-hint listening';
+        };
+
+        recognition.onresult = (e) => {
+            const transcript = e.results[0][0].transcript.trim().toLowerCase();
+            parseVoice(transcript);
+            stopVoice();
+        };
+
+        recognition.onerror = () => { stopVoice(); showToast(t('voiceError'), 'error'); };
+        recognition.onend = () => { if (isRecording) stopVoice(); };
+
+        recognition.start();
+    }
+
+    function stopVoice() {
+        if (recognition) { try { recognition.abort(); } catch {} recognition = null; }
+        isRecording = false;
+        const btn = document.getElementById('voiceBtn');
+        btn.classList.remove('recording');
+        btn.textContent = t('voiceBtn');
+        const hint = document.getElementById('voiceHint');
+        hint.textContent = lang === 'zh' ? t('voiceHintZh') : t('voiceHint');
+        hint.className = 'voice-hint';
+    }
+
+    function parseVoice(text) {
+        const nameInput = document.getElementById('itemName');
+        const priceInput = document.getElementById('itemPrice');
+        const qtyInput = document.getElementById('itemQty');
+
+        let name = text;
+        let price = NaN;
+        let qty = NaN;
+
+        const patterns = [
+            /(\d+\.?\d*)\s*(?:dollar|dollars|\$|price|for|at)\s*(?:and\s*)?(\d{1,2})?\s*(?:cent|cents)?/i,
+            /(\d+\.?\d*)\s*(?:dollar|dollars|\$|price|for|at)/i,
+            /(?:price|for|at)\s*(\d+\.?\d*)/i,
+        ];
+
+        for (const p of patterns) {
+            const m = text.match(p);
+            if (m) {
+                price = parseFloat(m[1]);
+                if (m[2] && m[1].indexOf('.') === -1) price = parseFloat(m[1]) + parseFloat(m[2]) / 100;
+                name = name.replace(m[0], '').trim();
+                break;
+            }
+        }
+
+        const qtyMatch = name.match(/(?:^|\s)(\d+)\s*(?:x|qty|quantity|items?)\s*$/i);
+        if (qtyMatch) {
+            qty = parseInt(qtyMatch[1]);
+            name = name.replace(qtyMatch[0], '').trim();
+        }
+
+        const numMatch = name.match(/(?:^|\s+)(\d+\.?\d*)\s*$/);
+        if (numMatch && isNaN(price)) {
+            price = parseFloat(numMatch[1]);
+            name = name.replace(numMatch[0], '').trim();
+        }
+
+        if (!name) return;
+
+        nameInput.value = name.charAt(0).toUpperCase() + name.slice(1);
+        if (!isNaN(price) && price >= 0) priceInput.value = price.toFixed(2);
+        if (!isNaN(qty) && qty >= 1) qtyInput.value = qty;
+
+        showToast(t('voiceParsed', { name: nameInput.value }), 'success');
+        addItem();
+    }
+
+    // ── Add Item ──
     function addItem() {
         const listNameInput = document.getElementById('listName').value.trim();
         const itemName = document.getElementById('itemName').value.trim();
         const price = parseFloat(document.getElementById('itemPrice').value);
-        const qty = parseInt(document.getElementById('itemQty').value);
+        const qty = parseInt(document.getElementById('itemQty').value) || 1;
 
-        if (!listNameInput || !itemName || isNaN(price) || isNaN(qty)) {
-            alert(t('alertFill'));
+        if (!listNameInput || !itemName || isNaN(price) || price < 0) {
+            showToast(t('alertFill'), 'error');
             return;
         }
 
-        if (!shoppingData[listNameInput]) {
-            shoppingData[listNameInput] = [];
-        }
+        if (!shoppingData[listNameInput]) shoppingData[listNameInput] = [];
 
-        const newItem = {
-            id: Date.now(),
-            name: itemName,
-            price: price,
-            qty: qty
-        };
+        shoppingData[listNameInput].push({ id: Date.now(), name: itemName, price, qty, checked: false });
 
-        shoppingData[listNameInput].push(newItem);
         saveAndRender();
-
         document.getElementById('itemName').value = '';
         document.getElementById('itemPrice').value = '';
         document.getElementById('itemQty').value = '1';
+        document.getElementById('itemName').focus();
+        showToast(t('itemAdded'), 'success');
     }
 
-    function deleteItem(listName, itemId) {
-        shoppingData[listName] = shoppingData[listName].filter(item => item.id !== itemId);
+    // ── Edit Item ──
+    function editItem(listName, itemId) {
+        const list = shoppingData[listName];
+        const idx = list.findIndex(i => i.id === itemId);
+        if (idx === -1) return;
+
+        const card = document.querySelector(`[data-list="${CSS.escape(listName)}"]`);
+        if (!card) return;
+        const row = card.querySelector(`[data-item-id="${itemId}"]`);
+        if (!row) return;
+
+        const item = list[idx];
+        row.innerHTML = `
+            <td><input type="text" class="edit-name" value="${item.name.replace(/"/g,'&quot;')}"></td>
+            <td><input type="number" class="edit-qty" value="${item.qty}" min="1" style="width:54px"></td>
+            <td><input type="number" class="edit-price" value="${item.price}" step="0.01" min="0" style="width:70px"></td>
+            <td colspan="2"><div class="edit-actions"><button onclick="saveItem('${listName}',${itemId})">${t('save')}</button><button class="btn-outline" onclick="cancelEdit('${listName}',${itemId})">${t('cancel')}</button></div></td>
+        `;
+    }
+
+    function saveItem(listName, itemId) {
+        const card = document.querySelector(`[data-list="${CSS.escape(listName)}"]`);
+        if (!card) return;
+        const row = card.querySelector(`[data-item-id="${itemId}"]`);
+        if (!row) return;
+
+        const name = row.querySelector('.edit-name').value.trim();
+        const qty = parseInt(row.querySelector('.edit-qty').value) || 1;
+        const price = parseFloat(row.querySelector('.edit-price').value);
+
+        const list = shoppingData[listName];
+        const idx = list.findIndex(i => i.id === itemId);
+        if (idx === -1 || !name || isNaN(price)) { showToast(t('alertFill'), 'error'); return; }
+
+        list[idx].name = name;
+        list[idx].qty = qty;
+        list[idx].price = price;
         saveAndRender();
+        showToast(t('itemAdded'), 'success');
     }
 
+    function cancelEdit(listName, itemId) {
+        const card = document.querySelector(`[data-list="${CSS.escape(listName)}"]`);
+        if (!card) return;
+        const row = card.querySelector(`[data-item-id="${itemId}"]`);
+        if (row) row.remove();
+        render();
+    }
+
+    // ── Toggle Check ──
+    function toggleCheck(listName, itemId) {
+        const list = shoppingData[listName];
+        const item = list.find(i => i.id === itemId);
+        if (item) { item.checked = !item.checked; saveAndRender(); }
+    }
+
+    // ── Delete Item ──
+    function deleteItem(listName, itemId) {
+        shoppingData[listName] = shoppingData[listName].filter(i => i.id !== itemId);
+        saveAndRender();
+        showToast(t('itemDeleted'));
+    }
+
+    // ── Delete List ──
     function deleteList(listName) {
         if (confirm(t('deleteConfirm', { name: listName }))) {
             delete shoppingData[listName];
             saveAndRender();
+            showToast(t('listDeleted'));
         }
     }
 
+    // ── Rename List ──
+    function startRename(listName) {
+        const card = document.querySelector(`[data-list="${CSS.escape(listName)}"]`);
+        if (!card) return;
+        const titleWrap = card.querySelector('.list-title-wrap');
+        const h3 = titleWrap.querySelector('h3');
+        const existingInput = titleWrap.querySelector('input');
+        if (existingInput) return;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = listName;
+        input.placeholder = t('renamePlaceholder');
+        input.dataset.orig = listName;
+        h3.replaceWith(input);
+        input.focus();
+        input.select();
+
+        const renameBtn = card.querySelector('.rename-btn');
+        if (renameBtn) renameBtn.style.display = 'none';
+    }
+
+    function confirmRename(listName) {
+        const card = document.querySelector(`[data-list="${CSS.escape(listName)}"]`);
+        if (!card) return;
+        const input = card.querySelector('.list-title-wrap input');
+        if (!input) return;
+        const newName = input.value.trim();
+        if (!newName || newName === listName) { cancelRename(listName); return; }
+
+        shoppingData[newName] = shoppingData[listName];
+        delete shoppingData[listName];
+        saveAndRender();
+        showToast(t('renameDone'));
+    }
+
+    function cancelRename(listName) {
+        render();
+    }
+
+    // ── Filter ──
+    function filterLists() {
+        const q = document.getElementById('filterInput').value.toLowerCase().trim();
+        document.querySelectorAll('.list-card').forEach(card => {
+            if (!q) { card.classList.remove('hidden'); return; }
+            const text = card.textContent.toLowerCase();
+            card.classList.toggle('hidden', !text.includes(q));
+        });
+    }
+
+    // ── Export / Import ──
+    function exportData() {
+        const data = localStorage.getItem('shopping_data');
+        if (!data || data === '{}') { showToast(t('exportError'), 'error'); return; }
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'shopping-list-backup.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importData(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                if (typeof data !== 'object' || Array.isArray(data)) throw Error();
+                shoppingData = data;
+                saveAndRender();
+                showToast(t('imported'), 'success');
+            } catch {
+                showToast(t('importError'), 'error');
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    }
+
+    // ── Save & Render ──
     function saveAndRender() {
         localStorage.setItem('shopping_data', JSON.stringify(shoppingData));
         render();
     }
 
+    // ── Render ──
     function render() {
         const display = document.getElementById('listsDisplay');
         const datalist = document.getElementById('saved-lists');
+        const itemsDatalist = document.getElementById('saved-items');
         display.innerHTML = '';
         datalist.innerHTML = '';
+        itemsDatalist.innerHTML = '';
 
         const listNames = Object.keys(shoppingData);
 
         if (listNames.length === 0) {
-            display.innerHTML = `<div class="empty-msg">${t('emptyMsg')}</div>`;
+            display.innerHTML = `<div class="empty-msg"><strong>${t('emptyMsg')}</strong><p>${t('emptySub')}</p></div>`;
             return;
         }
+
+        const allItems = new Set();
 
         listNames.forEach(name => {
             const option = document.createElement('option');
@@ -345,6 +1006,7 @@
 
             const card = document.createElement('div');
             card.className = 'list-card';
+            card.dataset.list = name;
 
             let itemsHtml = '';
             let listTotal = 0;
@@ -352,30 +1014,43 @@
             shoppingData[name].forEach(item => {
                 const itemTotal = item.price * item.qty;
                 listTotal += itemTotal;
+                allItems.add(item.name);
+                const checked = item.checked ? ' checked' : '';
                 itemsHtml += `
-                    <tr>
+                    <tr class="item-row${checked ? ' checked' : ''}" data-item-id="${item.id}">
+                        <td><input type="checkbox" class="check-item" onchange="toggleCheck('${name}',${item.id})"${checked}></td>
                         <td>${item.name}</td>
-                        <td class="item-total">$${itemTotal.toFixed(2)}</td>
-                        <td class="delete-item" onclick="deleteItem('${name}', ${item.id})">×</td>
+                        <td>${item.qty}×$${item.price.toFixed(2)}</td>
+                        <td>$${itemTotal.toFixed(2)}</td>
+                        <td><button class="edit-item-btn" onclick="editItem('${name}',${item.id})" title="${t('edit')}">✎</button></td>
+                        <td><button class="del-item-btn" onclick="deleteItem('${name}',${item.id})">×</button></td>
                     </tr>
                 `;
             });
 
             card.innerHTML = `
-                <h3>
-                    ${name} 
-                    <button class="delete-list-btn" onclick="deleteList('${name}')">${t('deleteList')}</button>
-                </h3>
+                <div class="list-header">
+                    <div class="list-title-wrap">
+                        <h3>${name}</h3>
+                    </div>
+                    <div class="list-header-actions">
+                        <button class="rename-btn btn-outline" onclick="startRename('${name}')">✎</button>
+                        <button class="delete-list-btn btn-outline" onclick="deleteList('${name}')">${t('deleteList')}</button>
+                    </div>
+                </div>
                 <table>
                     <thead>
                         <tr>
+                            <th style="width:24px"></th>
                             <th>${t('item')}</th>
-                            <th style="text-align:right">${t('total')}</th>
-                            <th></th>
+                            <th style="text-align:center">${t('qtyCol')}</th>
+                            <th style="text-align:right">${t('totalCol')}</th>
+                            <th style="width:28px"></th>
+                            <th style="width:28px"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${itemsHtml || `<tr><td colspan="3" style="text-align:center">${t('empty')}</td></tr>`}
+                        ${itemsHtml || `<tr><td colspan="6" style="text-align:center;color:var(--muted)">${t('empty')}</td></tr>`}
                     </tbody>
                 </table>
                 <div class="grand-total">${t('grandTotal', { amount: listTotal.toFixed(2) })}</div>
@@ -383,11 +1058,18 @@
 
             display.appendChild(card);
         });
+
+        allItems.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            itemsDatalist.appendChild(opt);
+        });
+
+        filterLists();
     }
 
     applyLang();
     render();
 </script>
-
 </body>
 </html>
