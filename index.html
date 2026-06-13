@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Smart Shopping List</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #64748b;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .lists-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .list-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .list-card h3 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-list-btn {
+            background: none;
+            color: var(--danger);
+            padding: 2px 8px;
+            border: 1px solid var(--danger);
+            font-size: 0.7rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th {
+            text-align: left;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        td {
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .item-total {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .grand-total {
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: right;
+            color: var(--primary);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .delete-item {
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: #94a3b8;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <h1>🛒 <span data-i18n="appTitle">Shopping List Manager</span></h1>
+            <button id="langToggle" style="padding:6px 14px;font-size:0.85rem">中文</button>
+        </div>
+        <p data-i18n="appDesc">Organize your shopping by categories</p>
+    </header>
+
+    <div class="input-section">
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label data-i18n="listName">List Name</label>
+                <input type="text" id="listName" placeholder="e.g. Grocery, Tech" list="saved-lists">
+                <datalist id="saved-lists"></datalist>
+            </div>
+            <div class="input-group">
+                <label data-i18n="itemName">Item Name</label>
+                <input type="text" id="itemName" placeholder="e.g. Milk">
+            </div>
+            <div class="input-group">
+                <label data-i18n="price">Price ($)</label>
+                <input type="number" id="itemPrice" step="0.01" placeholder="0.00">
+            </div>
+            <div class="input-group">
+                <label data-i18n="quantity">Quantity</label>
+                <input type="number" id="itemQty" value="1">
+            </div>
+        </div>
+        <button onclick="addItem()" data-i18n="addToList">Add to List</button>
+    </div>
+
+    <div id="listsDisplay" class="lists-container">
+    </div>
+</div>
+
+<script>
+    const i18n = {
+        en: {
+            title: "Smart Shopping List",
+            appTitle: "Shopping List Manager",
+            appDesc: "Organize your shopping by categories",
+            listName: "List Name",
+            itemName: "Item Name",
+            price: "Price ($)",
+            quantity: "Quantity",
+            addToList: "Add to List",
+            item: "Item",
+            total: "Total",
+            empty: "Empty",
+            emptyMsg: "No lists created yet. Start by adding an item!",
+            deleteList: "Delete List",
+            deleteConfirm: 'Delete the entire "{{name}}" list?',
+            alertFill: "Please fill in all fields correctly.",
+            grandTotal: "Total: ${{amount}}",
+        },
+        zh: {
+            title: "智慧購物清單",
+            appTitle: "購物清單管理",
+            appDesc: "按類別整理您的購物項目",
+            listName: "清單名稱",
+            itemName: "商品名稱",
+            price: "價格 ($)",
+            quantity: "數量",
+            addToList: "加入清單",
+            item: "項目",
+            total: "小計",
+            empty: "無項目",
+            emptyMsg: "尚未建立清單，請新增項目！",
+            deleteList: "刪除清單",
+            deleteConfirm: '確定刪除「{{name}}」清單？',
+            alertFill: "請正確填寫所有欄位。",
+            grandTotal: "總計：${{amount}}",
+        }
+    };
+
+    let lang = localStorage.getItem('shopping_lang') || 'en';
+
+    function t(key, vars = {}) {
+        let str = i18n[lang][key] || key;
+        for (const [k, v] of Object.entries(vars)) {
+            str = str.replace(`{{${k}}}`, v);
+        }
+        return str;
+    }
+
+    function applyLang() {
+        document.documentElement.lang = lang === 'zh' ? 'zh-TW' : 'en';
+        document.getElementById('langToggle').textContent = lang === 'zh' ? 'English' : '中文';
+        document.title = t('title');
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            el.textContent = t(el.dataset.i18n);
+        });
+        document.getElementById('listName').placeholder = lang === 'zh' ? '例如：生鮮、3C' : 'e.g. Grocery, Tech';
+        document.getElementById('itemName').placeholder = lang === 'zh' ? '例如：牛奶' : 'e.g. Milk';
+        document.getElementById('itemPrice').placeholder = lang === 'zh' ? '0.00' : '0.00';
+        updateEmptyMsg();
+        render();
+    }
+
+    function updateEmptyMsg() {
+        const empty = document.querySelector('.empty-msg');
+        if (empty) empty.textContent = t('emptyMsg');
+    }
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+        lang = lang === 'en' ? 'zh' : 'en';
+        localStorage.setItem('shopping_lang', lang);
+        applyLang();
+    });
+
+    let shoppingData = JSON.parse(localStorage.getItem('shopping_data')) || {};
+
+    function addItem() {
+        const listNameInput = document.getElementById('listName').value.trim();
+        const itemName = document.getElementById('itemName').value.trim();
+        const price = parseFloat(document.getElementById('itemPrice').value);
+        const qty = parseInt(document.getElementById('itemQty').value);
+
+        if (!listNameInput || !itemName || isNaN(price) || isNaN(qty)) {
+            alert(t('alertFill'));
+            return;
+        }
+
+        if (!shoppingData[listNameInput]) {
+            shoppingData[listNameInput] = [];
+        }
+
+        const newItem = {
+            id: Date.now(),
+            name: itemName,
+            price: price,
+            qty: qty
+        };
+
+        shoppingData[listNameInput].push(newItem);
+        saveAndRender();
+
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemPrice').value = '';
+        document.getElementById('itemQty').value = '1';
+    }
+
+    function deleteItem(listName, itemId) {
+        shoppingData[listName] = shoppingData[listName].filter(item => item.id !== itemId);
+        saveAndRender();
+    }
+
+    function deleteList(listName) {
+        if (confirm(t('deleteConfirm', { name: listName }))) {
+            delete shoppingData[listName];
+            saveAndRender();
+        }
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('shopping_data', JSON.stringify(shoppingData));
+        render();
+    }
+
+    function render() {
+        const display = document.getElementById('listsDisplay');
+        const datalist = document.getElementById('saved-lists');
+        display.innerHTML = '';
+        datalist.innerHTML = '';
+
+        const listNames = Object.keys(shoppingData);
+
+        if (listNames.length === 0) {
+            display.innerHTML = `<div class="empty-msg">${t('emptyMsg')}</div>`;
+            return;
+        }
+
+        listNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            datalist.appendChild(option);
+
+            const card = document.createElement('div');
+            card.className = 'list-card';
+
+            let itemsHtml = '';
+            let listTotal = 0;
+
+            shoppingData[name].forEach(item => {
+                const itemTotal = item.price * item.qty;
+                listTotal += itemTotal;
+                itemsHtml += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td class="item-total">$${itemTotal.toFixed(2)}</td>
+                        <td class="delete-item" onclick="deleteItem('${name}', ${item.id})">×</td>
+                    </tr>
+                `;
+            });
+
+            card.innerHTML = `
+                <h3>
+                    ${name} 
+                    <button class="delete-list-btn" onclick="deleteList('${name}')">${t('deleteList')}</button>
+                </h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>${t('item')}</th>
+                            <th style="text-align:right">${t('total')}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml || `<tr><td colspan="3" style="text-align:center">${t('empty')}</td></tr>`}
+                    </tbody>
+                </table>
+                <div class="grand-total">${t('grandTotal', { amount: listTotal.toFixed(2) })}</div>
+            `;
+
+            display.appendChild(card);
+        });
+    }
+
+    applyLang();
+    render();
+</script>
+
+</body>
+</html>
