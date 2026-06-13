@@ -514,31 +514,12 @@
             transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.2s;
         }
 
-        .list-card.removing {
-            opacity: 0;
-            transform: scale(0.95) translateY(-8px);
-        }
-
         .item-row {
             transition: opacity 0.25s ease, background 0.25s ease;
         }
 
-        .item-row.removing {
-            opacity: 0;
-            transform: translateX(20px);
-        }
-
         .item-row.checked {
             transition: opacity 0.25s ease, text-decoration 0.25s ease;
-        }
-
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(12px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .list-card:first-child {
-            animation: cardIn 0.3s ease-out;
         }
 
         /* ── Collapsible input ── */
@@ -1499,7 +1480,6 @@
     initTheme();
     applyInputState();
     applyShoppingMode();
-    render();
 </script>
 </body>
 </html>
