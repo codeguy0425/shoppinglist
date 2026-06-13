@@ -959,6 +959,7 @@
         row.setAttribute('draggable', 'true');
 
         row.addEventListener('dragstart', e => {
+            if (e.target.closest('button, input, select, .check-item')) { e.preventDefault(); return; }
             dragSource = row;
             dragListName = listName;
             row.classList.add('dragging');
@@ -999,36 +1000,49 @@
             saveAndRender();
         });
 
-        // Touch support
+        // Touch support: long-press to drag
+        let touchTimer = null;
+        let touchDragging = false;
         let touchStartY = 0;
+        let touchStartX = 0;
         let touchClone = null;
-        let touchMoveCount = 0;
 
         row.addEventListener('touchstart', e => {
+            if (e.target.closest('button, input, select, .check-item')) return;
             const t = e.touches[0];
             touchStartY = t.clientY;
-            touchMoveCount = 0;
-            dragSource = row;
-            dragListName = listName;
-            touchClone = row.cloneNode(true);
-            touchClone.style.position = 'fixed';
-            touchClone.style.pointerEvents = 'none';
-            touchClone.style.opacity = '0.7';
-            touchClone.style.width = row.offsetWidth + 'px';
-            touchClone.style.zIndex = '999';
-            touchClone.style.transform = 'scale(1.02)';
-            touchClone.style.background = 'var(--card)';
-            touchClone.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
-            touchClone.style.borderRadius = '8px';
-            touchClone.style.left = row.getBoundingClientRect().left + 'px';
-            touchClone.style.top = (t.clientY - row.offsetHeight / 2) + 'px';
-            document.body.appendChild(touchClone);
+            touchStartX = t.clientX;
+            touchDragging = false;
+            touchTimer = setTimeout(() => {
+                touchDragging = true;
+                dragSource = row;
+                dragListName = listName;
+                row.classList.add('dragging');
+                touchClone = row.cloneNode(true);
+                touchClone.style.position = 'fixed';
+                touchClone.style.pointerEvents = 'none';
+                touchClone.style.opacity = '0.7';
+                touchClone.style.width = row.offsetWidth + 'px';
+                touchClone.style.zIndex = '999';
+                touchClone.style.transform = 'scale(1.02)';
+                touchClone.style.background = 'var(--card)';
+                touchClone.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+                touchClone.style.borderRadius = '8px';
+                touchClone.style.left = row.getBoundingClientRect().left + 'px';
+                touchClone.style.top = (t.clientY - row.offsetHeight / 2) + 'px';
+                document.body.appendChild(touchClone);
+            }, 300);
         }, { passive: true });
 
         row.addEventListener('touchmove', e => {
-            e.preventDefault();
             const t = e.touches[0];
-            touchMoveCount++;
+            const dy = Math.abs(t.clientY - touchStartY);
+            const dx = Math.abs(t.clientX - touchStartX);
+            if (!touchDragging) {
+                if (dy > 10 || dx > 10) { clearTimeout(touchTimer); touchTimer = null; }
+                return;
+            }
+            e.preventDefault();
             if (touchClone) {
                 touchClone.style.top = (t.clientY - row.offsetHeight / 2) + 'px';
             }
@@ -1042,30 +1056,34 @@
         }, { passive: false });
 
         row.addEventListener('touchend', e => {
+            if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
             if (touchClone) { touchClone.remove(); touchClone = null; }
-            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-            if (touchMoveCount < 5) { dragSource = null; return; }
-            if (!dragListName) return;
-            const t = e.changedTouches[0];
-            const target = document.elementFromPoint(t.clientX, t.clientY);
-            if (!target) { dragSource = null; return; }
-            const tr = target.closest('.item-row');
-            if (tr && tr !== dragSource) {
-                const from = parseInt(dragSource.dataset.itemId);
-                const to = parseInt(tr.dataset.itemId);
-                if (!isNaN(from) && !isNaN(to)) {
-                    const items = shoppingData[dragListName];
-                    const fromIdx = items.findIndex(i => i.id === from);
-                    const toIdx = items.findIndex(i => i.id === to);
-                    if (fromIdx !== -1 && toIdx !== -1) {
-                        const [moved] = items.splice(fromIdx, 1);
-                        items.splice(toIdx, 0, moved);
-                        saveAndRender();
+            if (touchDragging) {
+                row.classList.remove('dragging');
+                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                if (!dragListName) { dragSource = null; return; }
+                const t = e.changedTouches[0];
+                const target = document.elementFromPoint(t.clientX, t.clientY);
+                if (!target) { dragSource = null; dragListName = null; touchDragging = false; return; }
+                const tr = target.closest('.item-row');
+                if (tr && tr !== dragSource) {
+                    const from = parseInt(dragSource.dataset.itemId);
+                    const to = parseInt(tr.dataset.itemId);
+                    if (!isNaN(from) && !isNaN(to)) {
+                        const items = shoppingData[dragListName];
+                        const fromIdx = items.findIndex(i => i.id === from);
+                        const toIdx = items.findIndex(i => i.id === to);
+                        if (fromIdx !== -1 && toIdx !== -1) {
+                            const [moved] = items.splice(fromIdx, 1);
+                            items.splice(toIdx, 0, moved);
+                            saveAndRender();
+                        }
                     }
                 }
+                dragSource = null;
+                dragListName = null;
+                touchDragging = false;
             }
-            dragSource = null;
-            dragListName = null;
         }, { passive: true });
     }
     function showToast(msg, type = '') {
