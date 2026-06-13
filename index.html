@@ -1085,6 +1085,18 @@
                 touchDragging = false;
             }
         }, { passive: true });
+
+        row.addEventListener('touchcancel', () => {
+            if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+            if (touchClone) { touchClone.remove(); touchClone = null; }
+            if (touchDragging) {
+                row.classList.remove('dragging');
+                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            }
+            dragSource = null;
+            dragListName = null;
+            touchDragging = false;
+        }, { passive: true });
     }
     function showToast(msg, type = '') {
         const container = document.getElementById('toastContainer');
