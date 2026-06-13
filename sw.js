@@ -1,5 +1,5 @@
 const CACHE = 'shopping-list-v1';
-const URLS = ['/', '/index.html', '/manifest.json'];
+const URLS = ['/', '/index.html', '/manifest.json', '/style.css', '/script.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(

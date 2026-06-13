@@ -2,9 +2,9 @@
 
 ## Architecture
 
-- **Single-page app** — all HTML, CSS, JS in `index.html`. No build system, no bundler, no framework.
+- **Single-page app** — `index.html` + `style.css` + `script.js`. No build system, no bundler, no framework.
 - **GitHub Pages** — site lives at `https://codeguy0425.github.io/shoppinglist/`. Push to `master` to deploy.
-- **PWA** — `sw.js` caches `/`, `/index.html`, `/manifest.json` cache-first. Hard refresh or clear cache to see changes after deploy.
+- **PWA** — `sw.js` caches `/`, `/index.html`, `/manifest.json`, `/style.css`, `/script.js` cache-first. Hard refresh or clear cache to see changes after deploy.
 
 ## Key Conventions
 
