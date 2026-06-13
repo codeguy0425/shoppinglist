@@ -383,24 +383,10 @@
         .edit-item-btn:hover { background: var(--primary-light); color: var(--primary); }
         .del-item-btn:hover { background: #fef2f2; color: var(--danger); }
 
-        .item-edit-row td {
-            padding: 4px 0;
-        }
-
-        .item-edit-row input {
+        .item-row input {
             padding: 6px 8px;
             font-size: 0.85rem;
-            width: 100%;
-        }
-
-        .item-edit-row .edit-actions {
-            display: flex;
-            gap: 4px;
-        }
-
-        .item-edit-row .edit-actions button {
-            padding: 4px 8px;
-            font-size: 0.75rem;
+            box-sizing: border-box;
         }
 
         .grand-total {
@@ -1240,10 +1226,12 @@
 
         const item = list[idx];
         row.innerHTML = `
-            <td><input type="text" class="edit-name" value="${item.name.replace(/"/g,'&quot;')}"></td>
-            <td><input type="number" class="edit-qty" value="${item.qty}" min="1" style="width:54px"></td>
-            <td><input type="number" class="edit-price" value="${item.price}" step="0.01" min="0" style="width:70px"></td>
-            <td colspan="2"><div class="edit-actions"><button onclick="saveItem('${listName}',${itemId})">${t('save')}</button><button class="btn-outline" onclick="cancelEdit('${listName}',${itemId})">${t('cancel')}</button></div></td>
+            <td style="text-align:center"><button class="del-item-btn" onclick="cancelEdit('${listName}',${itemId})" title="${t('cancel')}">✕</button></td>
+            <td><input type="text" class="edit-name" value="${item.name.replace(/"/g,'&quot;')}" style="width:100%;min-width:50px"></td>
+            <td style="text-align:center"><input type="number" class="edit-qty" value="${item.qty}" min="1" style="width:50px;text-align:center"></td>
+            <td style="text-align:right"><input type="number" class="edit-price" value="${item.price}" step="0.01" min="0" style="width:72px;text-align:right"></td>
+            <td style="text-align:center"><button class="edit-item-btn" onclick="saveItem('${listName}',${itemId})" title="${t('save')}">✓</button></td>
+            <td></td>
         `;
     }
 
