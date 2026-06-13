@@ -326,6 +326,7 @@
 
         table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
             margin: 10px 0;
         }
@@ -338,28 +339,24 @@
             padding-bottom: 6px;
         }
 
-        th:nth-child(2) { text-align: center; }
-        th:nth-child(3) { text-align: right; }
-        th:nth-child(4) { width: 30px; }
-        th:nth-child(5) { width: 30px; }
-
         td {
             padding: 6px 0;
             font-size: 0.9rem;
             vertical-align: middle;
         }
 
-        td:nth-child(2) { text-align: center; color: var(--muted); font-size: 0.8rem; }
-        td:nth-child(3) { text-align: right; font-weight: 600; }
-        td:nth-child(4), td:nth-child(5) { text-align: center; }
+        td:nth-child(3) { text-align: center; }
+        td:nth-child(4) { text-align: right; font-weight: 600; }
+        td:nth-child(5) { text-align: center; }
+        td:nth-child(6) { text-align: center; }
 
         .item-row.checked td {
             text-decoration: line-through;
             opacity: 0.5;
         }
 
-        .item-row.checked td:nth-child(4),
-        .item-row.checked td:nth-child(5) {
+        .item-row.checked td:nth-child(5),
+        .item-row.checked td:nth-child(6) {
             opacity: 1;
         }
 
@@ -1227,9 +1224,9 @@
         const item = list[idx];
         row.innerHTML = `
             <td style="text-align:center"><button class="del-item-btn" onclick="cancelEdit('${listName}',${itemId})" title="${t('cancel')}">✕</button></td>
-            <td><input type="text" class="edit-name" value="${item.name.replace(/"/g,'&quot;')}" style="width:100%;min-width:50px"></td>
-            <td style="text-align:center"><input type="number" class="edit-qty" value="${item.qty}" min="1" style="width:50px;text-align:center"></td>
-            <td style="text-align:right"><input type="number" class="edit-price" value="${item.price}" step="0.01" min="0" style="width:72px;text-align:right"></td>
+            <td><input type="text" class="edit-name" value="${item.name.replace(/"/g,'&quot;')}" style="width:100%"></td>
+            <td style="text-align:center"><input type="number" class="edit-qty" value="${item.qty}" min="1" style="width:100%;text-align:center"></td>
+            <td style="text-align:right"><input type="number" class="edit-price" value="${item.price}" step="0.01" min="0" style="width:100%;text-align:right"></td>
             <td style="text-align:center"><button class="edit-item-btn" onclick="saveItem('${listName}',${itemId})" title="${t('save')}">✓</button></td>
             <td></td>
         `;
@@ -1435,12 +1432,12 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width:24px"></th>
+                            <th style="width:32px"></th>
                             <th>${t('item')}</th>
-                            <th style="text-align:center">${t('qtyCol')}</th>
-                            <th style="text-align:right">${t('totalCol')}</th>
-                            <th style="width:28px"></th>
-                            <th style="width:28px"></th>
+                            <th style="width:80px;text-align:center">${t('qtyCol')}</th>
+                            <th style="width:76px;text-align:right">${t('totalCol')}</th>
+                            <th style="width:32px"></th>
+                            <th style="width:32px"></th>
                         </tr>
                     </thead>
                     <tbody>
