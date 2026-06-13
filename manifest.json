@@ -1,0 +1,23 @@
+{
+  "name": "Smart Shopping List",
+  "short_name": "ShopList",
+  "description": "Organize your shopping with lists, voice input, and multi-language support",
+  "start_url": "/shoppinglist/",
+  "scope": "/shoppinglist/",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%234f46e5'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='white'%3E🛒%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='64' fill='%234f46e5'/%3E%3Ctext x='256' y='340' font-size='200' text-anchor='middle' fill='white'%3E🛒%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
