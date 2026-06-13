@@ -1302,6 +1302,12 @@
         input.focus();
         input.select();
 
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') confirmRename(listName);
+            if (e.key === 'Escape') cancelRename(listName);
+        });
+        input.addEventListener('blur', () => confirmRename(listName));
+
         const renameBtn = card.querySelector('.rename-btn');
         if (renameBtn) renameBtn.style.display = 'none';
     }
